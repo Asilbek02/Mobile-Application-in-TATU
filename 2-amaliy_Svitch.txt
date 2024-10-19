@@ -1,0 +1,59 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('Bilimning yagona haqiqiy manbai – tajriba.'),
+          // Sarlavhani markazga joylashtiramiz
+          centerTitle: true,
+          // AppBar foni uchun rang beramiz
+          backgroundColor: Colors.blueGrey,
+        ),
+        body: SwitchWidget(),
+      ),
+    );
+  }
+}
+
+class SwitchWidget extends StatefulWidget {
+  @override
+  _SwitchWidgetState createState() => _SwitchWidgetState();
+}
+
+class _SwitchWidgetState extends State<SwitchWidget> {
+  bool _isSwitched = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      // Butun ekranni qoplash uchun width va height ni infinity qilamiz
+      width: double.infinity,
+      height: double.infinity,
+      color: _isSwitched ? Colors.greenAccent : Colors.redAccent,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Switch(
+            value: _isSwitched,
+            onChanged: (value) {
+              setState(() {
+                _isSwitched = value;
+              });
+            },
+          ),
+          Text(
+            _isSwitched ? 'To‘g‘ri' : 'Noto‘g‘ri',
+            style: TextStyle(fontSize: 24),
+          ),
+        ],
+      ),
+    );
+  }
+}

@@ -5,7 +5,6 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
@@ -23,14 +22,12 @@ class MyApp extends StatelessWidget {
 }
 
 class SwitchWidget extends StatefulWidget {
-  @override
   _SwitchWidgetState createState() => _SwitchWidgetState();
 }
 
 class _SwitchWidgetState extends State<SwitchWidget> {
   bool _isSwitched = false;
 
-  @override
   Widget build(BuildContext context) {
     return Container(
       // Butun ekranni qoplash uchun width va height ni infinity qilamiz

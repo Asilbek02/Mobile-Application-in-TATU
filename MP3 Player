@@ -1,0 +1,354 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MyMusicApp());
+}
+
+class MyMusicApp extends StatelessWidget {
+
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: MusicPlayer(),
+    );
+  }
+}
+
+class MusicPlayer extends StatefulWidget {
+
+  _MusicPlayerState createState() => _MusicPlayerState();
+}
+
+class _MusicPlayerState extends State<MusicPlayer> with SingleTickerProviderStateMixin {
+  final List<String> songs = [
+    // Ingliz musiqalari
+    'Melody of Dreams',
+    'Symphony of Stars',
+    'Echoes of Eternity',
+    'Rhythm of Rain',
+    'Harmony of the Heart',
+    'Song of the Sea',
+    'Sunset Symphony',
+    'Echoes of the Forest',
+    'Waves of Emotion',
+    'Silent Melody',
+    // O'zbek musiqalari
+    'Yallama - O\'zbek qoshiqlari',
+    'Shaxzoda - Qalbim',
+    'Sevinch Mo\'minova - Bahor',
+    'Doston Ergashev - Hayot',
+    'Ozodbek Nazarbekov - Yolg\'on',
+    // Rus musiqalari
+    'Alla Pugacheva - Million Roses',
+    'Dima Bilan - Ne Goryu',
+    'Zemfira - Iskushenie',
+    'Sergey Lazarev - You Are the Only One',
+    'Maksim - Zerkala',
+  ];
+
+  List<String> filteredSongs = [];
+  String currentSong = '';
+  bool isPlaying = false;
+  double volume = 0.5;
+  bool isMenuOpen = false;
+
+  late AnimationController _animationController;
+  late List<Animation<double>> _heightAnimations;
+
+  final List<Color> equalizerColors = [
+    Colors.red,
+    Colors.green,
+    Colors.blue,
+    Colors.orange,
+    Colors.purple,
+    Colors.yellow,
+    Colors.cyan,
+  ];
+
+  final TextEditingController _searchController = TextEditingController();
+
+
+  void initState() {
+    super.initState();
+    filteredSongs = songs;
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 500),
+    )..repeat(reverse: true);
+
+    _heightAnimations = List.generate(7, (index) {
+      return Tween<double>(begin: 20.0, end: 50.0).animate(
+        CurvedAnimation(
+          parent: _animationController,
+          curve: Interval(index * 0.1, (index + 1) * 0.1, curve: Curves.easeInOut),
+        ),
+      );
+    });
+
+    _searchController.addListener(_onSearchChanged);
+  }
+
+  void _onSearchChanged() {
+    setState(() {
+      filteredSongs = songs
+          .where((song) => song.toLowerCase().contains(_searchController.text.toLowerCase()))
+          .toList();
+    });
+  }
+
+  void playPauseMusic(String song) {
+    setState(() {
+      currentSong = song;
+      isPlaying = !isPlaying;
+    });
+    if (isPlaying) {
+      _animationController.repeat(reverse: true);
+    } else {
+      _animationController.stop();
+    }
+  }
+
+  // Musiqani oldinga surish
+  void moveForward() {
+    int currentIndex = songs.indexOf(currentSong);
+    if (currentIndex < songs.length - 1) {
+      playPauseMusic(songs[currentIndex + 1]);
+    }
+  }
+
+  // Musiqani orqaga surish
+  void moveBackward() {
+    int currentIndex = songs.indexOf(currentSong);
+    if (currentIndex > 0) {
+      playPauseMusic(songs[currentIndex - 1]);
+    }
+  }
+
+  void toggleMenu() {
+    setState(() {
+      isMenuOpen = !isMenuOpen;
+    });
+  }
+
+  Widget _buildEqualizerBar(int index) {
+    final color = equalizerColors[index % equalizerColors.length];
+    return AnimatedBuilder(
+      animation: _heightAnimations[index],
+      builder: (context, child) {
+        return Container(
+          width: 12,
+          height: _heightAnimations[index].value + 10.0,
+          margin: EdgeInsets.symmetric(horizontal: 4),
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(6),
+          ),
+        );
+      },
+    );
+  }
+
+
+  void dispose() {
+    _animationController.dispose();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Music Player', style: TextStyle(fontSize: 24)),
+        backgroundColor: Colors.deepPurple,
+        leading: IconButton(
+          icon: Icon(Icons.menu),
+          onPressed: toggleMenu,
+        ),
+        actions: [
+          // Search field qo'shildi
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Container(
+              width: 200,
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: 'Search...',
+                  hintStyle: TextStyle(color: Colors.white70),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    borderSide: BorderSide.none,
+                  ),
+                  filled: true,
+                  fillColor: Colors.white.withOpacity(0.3),
+                  prefixIcon: Icon(Icons.search, color: Colors.white),
+                ),
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ),
+        ],
+      ),
+      body: Row(
+        children: [
+          if (isMenuOpen)
+            Container(
+              width: 250,
+              color: Colors.deepPurple,
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: Icon(Icons.playlist_play, color: Colors.white),
+                    title: Text('Playlist', style: TextStyle(color: Colors.white)),
+                    onTap: () {},
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.album, color: Colors.white),
+                    title: Text('Albums', style: TextStyle(color: Colors.white)),
+                    onTap: () {},
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.radio, color: Colors.white),
+                    title: Text('Radio', style: TextStyle(color: Colors.white)),
+                    onTap: () {},
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.category, color: Colors.white),
+                    title: Text('Genres', style: TextStyle(color: Colors.white)),
+                    onTap: () {},
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.info, color: Colors.white),
+                    title: Text('About', style: TextStyle(color: Colors.white)),
+                    onTap: () {},
+                  ),
+                ],
+              ),
+            ),
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.deepPurple, Colors.purpleAccent],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: filteredSongs.length,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          onTap: () {
+                            playPauseMusic(filteredSongs[index]);
+                          },
+                          child: AnimatedContainer(
+                            duration: Duration(milliseconds: 300),
+                            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            padding: EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: currentSong == filteredSongs[index] && isPlaying
+                                  ? Colors.purpleAccent.withOpacity(0.7)
+                                  : Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.2),
+                                  blurRadius: 10,
+                                  offset: Offset(0, 5),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  currentSong == filteredSongs[index] && isPlaying
+                                      ? Icons.pause_circle_filled
+                                      : Icons.play_circle_fill,
+                                  size: 40,
+                                  color: Colors.deepPurple,
+                                ),
+                                SizedBox(width: 20),
+                                Expanded(
+                                  child: Text(
+                                    filteredSongs[index],
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.deepPurple,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                    decoration: BoxDecoration(
+                      color: Colors.deepPurple,
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          currentSong.isNotEmpty ? 'Now Playing: $currentSong' : 'No Song Playing',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ),
+                        ),
+                        if (isPlaying)
+                          Container(
+                            height: 50,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: List.generate(
+                                7,
+                                (index) => _buildEqualizerBar(index),
+                              ),
+                            ),
+                          )
+                        else
+                          Icon(Icons.volume_off, color: Colors.white, size: 30),
+                      ],
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.skip_previous, color: Colors.white),
+                        onPressed: moveBackward,
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          isPlaying ? Icons.pause : Icons.play_arrow,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          playPauseMusic(currentSong);
+                        },
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.skip_next, color: Colors.white),
+                        onPressed: moveForward,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

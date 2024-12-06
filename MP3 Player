@@ -5,7 +5,6 @@ void main() {
 }
 
 class MyMusicApp extends StatelessWidget {
-
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -15,13 +14,11 @@ class MyMusicApp extends StatelessWidget {
 }
 
 class MusicPlayer extends StatefulWidget {
-
   _MusicPlayerState createState() => _MusicPlayerState();
 }
 
 class _MusicPlayerState extends State<MusicPlayer> with SingleTickerProviderStateMixin {
   final List<String> songs = [
-    // Ingliz musiqalari
     'Melody of Dreams',
     'Symphony of Stars',
     'Echoes of Eternity',
@@ -32,13 +29,11 @@ class _MusicPlayerState extends State<MusicPlayer> with SingleTickerProviderStat
     'Echoes of the Forest',
     'Waves of Emotion',
     'Silent Melody',
-    // O'zbek musiqalari
     'Yallama - O\'zbek qoshiqlari',
     'Shaxzoda - Qalbim',
     'Sevinch Mo\'minova - Bahor',
     'Doston Ergashev - Hayot',
     'Ozodbek Nazarbekov - Yolg\'on',
-    // Rus musiqalari
     'Alla Pugacheva - Million Roses',
     'Dima Bilan - Ne Goryu',
     'Zemfira - Iskushenie',
@@ -66,7 +61,6 @@ class _MusicPlayerState extends State<MusicPlayer> with SingleTickerProviderStat
   ];
 
   final TextEditingController _searchController = TextEditingController();
-
 
   void initState() {
     super.initState();
@@ -108,7 +102,6 @@ class _MusicPlayerState extends State<MusicPlayer> with SingleTickerProviderStat
     }
   }
 
-  // Musiqani oldinga surish
   void moveForward() {
     int currentIndex = songs.indexOf(currentSong);
     if (currentIndex < songs.length - 1) {
@@ -116,7 +109,6 @@ class _MusicPlayerState extends State<MusicPlayer> with SingleTickerProviderStat
     }
   }
 
-  // Musiqani orqaga surish
   void moveBackward() {
     int currentIndex = songs.indexOf(currentSong);
     if (currentIndex > 0) {
@@ -148,13 +140,32 @@ class _MusicPlayerState extends State<MusicPlayer> with SingleTickerProviderStat
     );
   }
 
-
   void dispose() {
     _animationController.dispose();
     _searchController.dispose();
     super.dispose();
   }
 
+  // About dialogini ko'rsatish uchun metod
+  void _showAboutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("About"),
+          content: Text("Kenjaboyev Asilbek"),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Dialogni yopish
+              },
+              child: Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -166,7 +177,6 @@ class _MusicPlayerState extends State<MusicPlayer> with SingleTickerProviderStat
           onPressed: toggleMenu,
         ),
         actions: [
-          // Search field qo'shildi
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
             child: Container(
@@ -218,10 +228,13 @@ class _MusicPlayerState extends State<MusicPlayer> with SingleTickerProviderStat
                     title: Text('Genres', style: TextStyle(color: Colors.white)),
                     onTap: () {},
                   ),
+                  // About tugmasiga onTap metodini qo'shamiz
                   ListTile(
                     leading: Icon(Icons.info, color: Colors.white),
                     title: Text('About', style: TextStyle(color: Colors.white)),
-                    onTap: () {},
+                    onTap: () {
+                      _showAboutDialog(context); // About tugmasi bosilganda dialogni ko'rsatish
+                    },
                   ),
                 ],
               ),
